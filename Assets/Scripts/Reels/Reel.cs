@@ -154,7 +154,7 @@ public class Reel : MonoBehaviour
         return closestHiddenSlot;
     }
 
-    // fixes minor inaccuracies between spins
+    // fixes minor inaccuracies between spinsA
     private void SnapSymbolsToGrid()
     {
         foreach (Image slot in symbolSlots)
