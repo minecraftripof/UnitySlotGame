@@ -15,13 +15,12 @@ public class LeverVisualController : MonoBehaviour
     // swaps to the pulled lever sprite before returning to normal
     public void PlayPullAnimation()
     {
-        if (isAnimating)
-            return;
+        if (isAnimating) { return; }
 
         StartCoroutine(PullAnimation());
     }
 
-    // handles the timing and visual swap for the lever pull
+    // handles timing and visual swap for the lever pull
     private IEnumerator PullAnimation()
     {
         isAnimating = true;

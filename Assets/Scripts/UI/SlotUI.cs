@@ -18,7 +18,6 @@ public class SlotUI : MonoBehaviour
         betText.text = $"Bet:\n{slotMachine.BetAmount}";
         winText.text = $"Win:\n{slotMachine.LastWinAmount}";
 
-        spinButton.interactable =
-            slotMachine.Credits >= slotMachine.BetAmount;
+        spinButton.interactable = slotMachine.CanSpin;
     }
 }

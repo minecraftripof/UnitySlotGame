@@ -7,6 +7,8 @@ public class SlotMachineController : MonoBehaviour
     [SerializeField] private Reel[] reels;
     [SerializeField] private SymbolData[] symbols;
     [SerializeField] private SlotUI slotUI;
+    [SerializeField] private WinPopupController winPopup;
+    [SerializeField] private SymbolRainController symbolRain;
 
     [Header("Spin Timing")]
     [SerializeField] private float firstReelSpinDuration = 1.2f;
@@ -19,6 +21,12 @@ public class SlotMachineController : MonoBehaviour
     public int Credits { get; private set; }
     public int LastWinAmount { get; private set; }
     public int BetAmount => betAmount;
+    public bool IsSpinning => IsAnyReelSpinning();
+
+    public bool CanSpin =>
+        Credits >= betAmount &&
+        !IsSpinning &&
+        !winPopup.IsOpen;
 
     private SymbolData[] currentResults;
 
@@ -45,18 +53,10 @@ public class SlotMachineController : MonoBehaviour
     // creates reels' outcomes, deducts the bet and starts spin animation
     public void Spin()
     {
-        if (IsAnyReelSpinning())
-            return;
-
-        if (Credits < betAmount)
-        {
-            Debug.Log("Not enough credits to spin.");
-            return;
-        }
+        if (!CanSpin) return;
 
         Credits -= betAmount;
         LastWinAmount = 0;
-        slotUI.RefreshUI();
 
         for (int i = 0; i < reels.Length; i++)
         {
@@ -64,11 +64,13 @@ public class SlotMachineController : MonoBehaviour
             currentResults[i] = result;
 
             // later reels spin slightly longer so they stop in succession
-            float spinDuration =
-                firstReelSpinDuration + (reelStopDelay * i);
+            float spinDuration = firstReelSpinDuration + (reelStopDelay * i);
 
             reels[i].SpinTo(result, spinDuration);
         }
+
+        // refreshes after the reels start so the lever is immediately disabled
+        slotUI.RefreshUI();
 
         StartCoroutine(EvaluateSpinWhenFinished());
     }
@@ -76,10 +78,7 @@ public class SlotMachineController : MonoBehaviour
     // waits for all reels to stop before checking the final result
     private IEnumerator EvaluateSpinWhenFinished()
     {
-        while (IsAnyReelSpinning())
-        {
-            yield return null;
-        }
+        while (IsAnyReelSpinning()) { yield return null; }
 
         EvaluateResult();
     }
@@ -102,11 +101,20 @@ public class SlotMachineController : MonoBehaviour
         LastWinAmount = betAmount * firstResult.PayoutMultiplier;
         Credits += LastWinAmount;
 
-        Debug.Log(
-            $"Win! {firstResult.SymbolName} x{currentResults.Length} " +
-            $"- payout: {LastWinAmount}, credits: {Credits}"
-        );
+        Debug.Log($"Win! {firstResult.SymbolName} x{currentResults.Length} " +
+                  $"- payout: {LastWinAmount}, credits: {Credits}");
 
+        // displays the popup and symbol rain at the same time
+        winPopup.Show(LastWinAmount);
+        symbolRain.Play(firstResult.Sprite);
+
+        slotUI.RefreshUI();
+    }
+
+    // acknowledges the popup and allows the player to spin again
+    public void CloseWinPopup()
+    {
+        winPopup.Hide();
         slotUI.RefreshUI();
     }
 
@@ -115,8 +123,7 @@ public class SlotMachineController : MonoBehaviour
     {
         foreach (Reel reel in reels)
         {
-            if (reel.IsSpinning)
-                return true;
+            if (reel.IsSpinning) { return true; }
         }
 
         return false;
@@ -146,8 +153,7 @@ public class SlotMachineController : MonoBehaviour
         {
             cumulativeWeight += Mathf.Max(0, symbol.Weight);
 
-            if (randomValue < cumulativeWeight)
-                return symbol;
+            if (randomValue < cumulativeWeight) { return symbol; }
         }
 
         // should never be reached, but ensures a valid return value
