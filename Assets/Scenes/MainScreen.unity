@@ -313,7 +313,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: x3, 30%
+  m_text: x7, 30%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -524,8 +524,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 125}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: 120}
+  m_SizeDelta: {x: 185, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &224863686
 MonoBehaviour:
@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: x2, 40%
+  m_text: x5, 40%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1702,7 +1702,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: x10, 10%
+  m_text: x20, 10%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1836,22 +1836,22 @@ MonoBehaviour:
   symbols:
   - symbolName: Symbol 1
     sprite: {fileID: 2193077994593488821, guid: a653df6187f5cd24f90e2752ba8048a0, type: 3}
-    payoutMultiplier: 2
+    payoutMultiplier: 5
     weight: 40
   - symbolName: Symbol 2
     sprite: {fileID: -5620835742497143143, guid: 8125db7baeb972e4286d7d461cabbca4, type: 3}
-    payoutMultiplier: 3
+    payoutMultiplier: 7
     weight: 30
   - symbolName: Symbol 3
     sprite: {fileID: -2391669244243282240, guid: 45d210b139933204c9d6227dde4cd9f7, type: 3}
-    payoutMultiplier: 5
+    payoutMultiplier: 12
     weight: 20
   - symbolName: Symbol 4
     sprite: {fileID: -4945717182177459964, guid: 90e3b4cba43684a478f2acaf89bb8e53, type: 3}
-    payoutMultiplier: 10
+    payoutMultiplier: 20
     weight: 10
   slotUI: {fileID: 1525733984}
-  resultPopup: {fileID: 0}
+  resultPopup: {fileID: 1798408550}
   symbolRain: {fileID: 2082887587}
   slotAudio: {fileID: 841340110}
   firstReelSpinDuration: 1.2
@@ -2235,8 +2235,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -65}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: -60}
+  m_SizeDelta: {x: 185, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1059833411
 MonoBehaviour:
@@ -2852,7 +2852,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 30}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 185, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1205582646
 MonoBehaviour:
@@ -4159,7 +4159,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7981d1981bb47f478e10bac6f7d55ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WinPopupController
-  resultPopupText: {fileID: 0}
+  resultPopupText: {fileID: 2120697557}
 --- !u!224 &1891204151 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 173346453013982673, guid: 2d3f97fe2a5c600438be6bbe7cc086ec, type: 3}
@@ -4496,7 +4496,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: x5, 20%
+  m_text: x12, 20%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4700,7 +4700,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 841340108}
         m_TargetAssemblyTypeName: SlotMachineController, Assembly-CSharp
-        m_MethodName: CloseWinPopup
+        m_MethodName: CloseResultPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
