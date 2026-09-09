@@ -11,7 +11,7 @@ public class Reel : MonoBehaviour
     [SerializeField] private float symbolSpacing = 105f;
     [SerializeField] private float spinSpeed = 900f;
     [SerializeField] private float accelerationTime = 0.25f;
-    [SerializeField] private float stopDuration = 0.12f;
+    [SerializeField] private float stopDecelerationPower = 0.25f;
 
     public bool IsSpinning { get; private set; }
 
@@ -24,7 +24,7 @@ public class Reel : MonoBehaviour
         RandomizeSymbols();
     }
 
-    // spin reel to result
+    // spins reel to result
     public void SpinTo(SymbolData result, float spinDuration)
     {
         if (IsSpinning ||
@@ -38,14 +38,14 @@ public class Reel : MonoBehaviour
         StartCoroutine(SpinRoutine(result, spinDuration));
     }
 
-    // acceleration, spinning and slow to stop
+    // handles acceleration, spinning and deceleration to the final result
     private IEnumerator SpinRoutine(SymbolData result, float spinDuration)
     {
         IsSpinning = true;
 
         float elapsed = 0f;
 
-        // accelerate to speed and stay at speed
+        // accelerates to full speed and stays there
         while (elapsed < spinDuration)
         {
             float accelerationProgress =
@@ -67,42 +67,39 @@ public class Reel : MonoBehaviour
         Image landingSlot = FindNextLandingSlot();
         landingSlot.sprite = result.Sprite;
 
-        float requiredDistance =
+        float remainingDistance =
             landingSlot.rectTransform.anchoredPosition.y;
 
-        float distanceAlreadyMoved = 0f;
-        float stopElapsed = 0f;
+        float totalStopDistance = remainingDistance;
 
-        while (stopElapsed < stopDuration)
+        // continues from full speed before rapidly decelerating toward the result
+        while (remainingDistance > 0f)
         {
-            float progress =
-                Mathf.Clamp01(stopElapsed / stopDuration);
+            float distanceRatio =
+                Mathf.Clamp01(remainingDistance / totalStopDistance);
 
-            // ease-out to sharp stop
-            float easedProgress =
-                1f - Mathf.Pow(1f - progress, 4f);
-
-            float targetTotalDistance =
-                requiredDistance * easedProgress;
+            float currentSpeed =
+                spinSpeed *
+                Mathf.Pow(distanceRatio, stopDecelerationPower);
 
             float distanceThisFrame =
-                targetTotalDistance - distanceAlreadyMoved;
+                Mathf.Min(
+                    currentSpeed * Time.deltaTime,
+                    remainingDistance
+                );
 
             MoveSymbols(distanceThisFrame);
-
-            distanceAlreadyMoved = targetTotalDistance;
-            stopElapsed += Time.deltaTime;
+            remainingDistance -= distanceThisFrame;
 
             yield return null;
         }
 
-        MoveSymbols(requiredDistance - distanceAlreadyMoved);
         SnapSymbolsToGrid();
 
         IsSpinning = false;
     }
 
-    // move symbols downward by distance and recycle symbols too low
+    // moves symbols downward by distance and recycles symbols too low
     private void MoveSymbols(float distance)
     {
         float loopHeight =
@@ -118,7 +115,7 @@ public class Reel : MonoBehaviour
 
             position.y -= distance;
 
-            // reusing slots
+            // reuses slots that leave the bottom
             while (position.y < lowerRecycleLimit)
             {
                 position.y += loopHeight;
@@ -129,7 +126,7 @@ public class Reel : MonoBehaviour
         }
     }
 
-    // finds the closest slot to the middle that is completely hidden above the reel window.
+    // finds the closest slot to the middle that is completely hidden above the reel window
     private Image FindNextLandingSlot()
     {
         Image closestHiddenSlot = null;
@@ -141,9 +138,10 @@ public class Reel : MonoBehaviour
         foreach (Image slot in symbolSlots)
         {
             float y = slot.rectTransform.anchoredPosition.y;
-            float halfSymbolHeight = slot.rectTransform.rect.height * 0.5f;
+            float halfSymbolHeight =
+                slot.rectTransform.rect.height * 0.5f;
 
-            // slot is only eligible once its bottom edge is above the reel's top edge.
+            // only selects slots whose bottom edge is above the reel window
             if (y - halfSymbolHeight >= reelTop && y < closestY)
             {
                 closestY = y;
@@ -154,7 +152,7 @@ public class Reel : MonoBehaviour
         return closestHiddenSlot;
     }
 
-    // fixes minor inaccuracies between spinsA
+    // fixes minor positioning inaccuracies between spins
     private void SnapSymbolsToGrid()
     {
         foreach (Image slot in symbolSlots)
@@ -170,19 +168,21 @@ public class Reel : MonoBehaviour
         }
     }
 
-    // gives each symbol an unweighted random sprite
+    // gives each symbol slot an unweighted random sprite
     private void RandomizeSymbols()
     {
         foreach (Image slot in symbolSlots)
         {
-            slot.sprite = GetRandomUnweightedVisualSymbol().Sprite;
+            slot.sprite =
+                GetRandomUnweightedVisualSymbol().Sprite;
         }
     }
 
-    // gets a true random sprite (only for decoration purposes)
+    // gets an unweighted random symbol for decoration only
     private SymbolData GetRandomUnweightedVisualSymbol()
     {
-        int index = Random.Range(0, availableSymbols.Length);
+        int index =
+            Random.Range(0, availableSymbols.Length);
 
         return availableSymbols[index];
     }

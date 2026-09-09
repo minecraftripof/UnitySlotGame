@@ -6,6 +6,7 @@ public class SlotMachineController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Reel[] reels;
     [SerializeField] private SymbolData[] symbols;
+    [SerializeField] private SlotUI slotUI;
 
     [Header("Spin Timing")]
     [SerializeField] private float firstReelSpinDuration = 1.2f;
@@ -17,6 +18,7 @@ public class SlotMachineController : MonoBehaviour
 
     public int Credits { get; private set; }
     public int LastWinAmount { get; private set; }
+    public int BetAmount => betAmount;
 
     private SymbolData[] currentResults;
 
@@ -36,6 +38,8 @@ public class SlotMachineController : MonoBehaviour
         {
             reel.Initialize(symbols);
         }
+
+        slotUI.RefreshUI();
     }
 
     // creates reels' outcomes, deducts the bet and starts spin animation
@@ -52,6 +56,7 @@ public class SlotMachineController : MonoBehaviour
 
         Credits -= betAmount;
         LastWinAmount = 0;
+        slotUI.RefreshUI();
 
         for (int i = 0; i < reels.Length; i++)
         {
@@ -89,6 +94,7 @@ public class SlotMachineController : MonoBehaviour
             if (currentResults[i] != firstResult)
             {
                 Debug.Log($"No win. Credits: {Credits}");
+                slotUI.RefreshUI();
                 return;
             }
         }
@@ -100,6 +106,8 @@ public class SlotMachineController : MonoBehaviour
             $"Win! {firstResult.SymbolName} x{currentResults.Length} " +
             $"- payout: {LastWinAmount}, credits: {Credits}"
         );
+
+        slotUI.RefreshUI();
     }
 
     // checks for any reel spinning
