@@ -17,8 +17,11 @@ Click the slot machine lever to spin.
 | Symbol | Weight | Payout |
 
 | Seven | 40 | 5x bet |
+
 | Cherry | 30 | 7x bet |
+
 | Bell | 20 | 12x bet |
+
 | BAR | 10 | 20x bet |
 
 The listed probabilities are the probability of each symbol appearing on an individual reel. Since all three reels must match to win, the probability of a winning combination is lower.
