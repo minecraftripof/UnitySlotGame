@@ -7,8 +7,9 @@ public class SlotMachineController : MonoBehaviour
     [SerializeField] private Reel[] reels;
     [SerializeField] private SymbolData[] symbols;
     [SerializeField] private SlotUI slotUI;
-    [SerializeField] private WinPopupController winPopup;
+    [SerializeField] private ResultPopupController resultPopup;
     [SerializeField] private SymbolRainController symbolRain;
+    [SerializeField] private SlotAudioController slotAudio;
 
     [Header("Spin Timing")]
     [SerializeField] private float firstReelSpinDuration = 1.2f;
@@ -17,6 +18,7 @@ public class SlotMachineController : MonoBehaviour
     [Header("Game Settings")]
     [SerializeField] private int startingCredits = 100;
     [SerializeField] private int betAmount = 10;
+    [SerializeField] private int jackpotCredits = 250;
 
     public int Credits { get; private set; }
     public int LastWinAmount { get; private set; }
@@ -26,9 +28,11 @@ public class SlotMachineController : MonoBehaviour
     public bool CanSpin =>
         Credits >= betAmount &&
         !IsSpinning &&
-        !winPopup.IsOpen;
+        !resultPopup.IsOpen &&
+        !gameEnded;
 
     private SymbolData[] currentResults;
+    private bool gameEnded;
 
     // initializes credits and every reel with the set of symbols available in the game
     private void Start()
@@ -39,7 +43,6 @@ public class SlotMachineController : MonoBehaviour
             return;
         }
 
-        Credits = startingCredits;
         currentResults = new SymbolData[reels.Length];
 
         foreach (Reel reel in reels)
@@ -47,7 +50,7 @@ public class SlotMachineController : MonoBehaviour
             reel.Initialize(symbols);
         }
 
-        slotUI.RefreshUI();
+        ResetGame();
     }
 
     // creates reels' outcomes, deducts the bet and starts spin animation
@@ -83,38 +86,75 @@ public class SlotMachineController : MonoBehaviour
         EvaluateResult();
     }
 
-    // checks whether all reels match and applies the payout if the player wins
+    // checks the spin result, applies payouts and handles end-game states
     private void EvaluateResult()
     {
         SymbolData firstResult = currentResults[0];
+        bool isWin = true;
 
         for (int i = 1; i < currentResults.Length; i++)
         {
             if (currentResults[i] != firstResult)
             {
-                Debug.Log($"No win. Credits: {Credits}");
-                slotUI.RefreshUI();
-                return;
+                isWin = false;
+                break;
             }
         }
 
-        LastWinAmount = betAmount * firstResult.PayoutMultiplier;
-        Credits += LastWinAmount;
+        if (isWin)
+        {
+            LastWinAmount = betAmount * firstResult.PayoutMultiplier;
+            Credits += LastWinAmount;
 
-        Debug.Log($"Win! {firstResult.SymbolName} x{currentResults.Length} " +
-                  $"- payout: {LastWinAmount}, credits: {Credits}");
+            Debug.Log($"Win! {firstResult.SymbolName} x{currentResults.Length} " +
+                      $"- payout: {LastWinAmount}, credits: {Credits}");
 
-        // displays the popup and symbol rain at the same time
-        winPopup.Show(LastWinAmount);
-        symbolRain.Play(firstResult.Sprite);
+            // winning symbol rain appears alongside either winning popup
+            symbolRain.Play(firstResult.Sprite);
+
+            if (Credits >= jackpotCredits)
+            {
+                gameEnded = true;
+                resultPopup.ShowJackpot(Credits);
+                slotAudio.PlayJackpot();
+            }
+            else
+            {
+                resultPopup.ShowWin(LastWinAmount);
+                slotAudio.PlayNormalWin();
+            }
+        }
+        else
+        {
+            Debug.Log($"No win. Credits: {Credits}");
+
+            if (Credits < betAmount)
+            {
+                gameEnded = true;
+                resultPopup.ShowGameOver();
+                slotAudio.PlayGameOver();
+            }
+        }
 
         slotUI.RefreshUI();
     }
 
-    // acknowledges the popup and allows the player to spin again
-    public void CloseWinPopup()
+    // acknowledges the current popup or restarts after an end-game popup
+    public void CloseResultPopup()
     {
-        winPopup.Hide();
+        resultPopup.Hide();
+
+        if (gameEnded) { ResetGame(); }
+        else { slotUI.RefreshUI(); }
+    }
+
+    // resets credits and state for a new game
+    private void ResetGame()
+    {
+        Credits = startingCredits;
+        LastWinAmount = 0;
+        gameEnded = false;
+
         slotUI.RefreshUI();
     }
 

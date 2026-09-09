@@ -6,6 +6,7 @@ public class Reel : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Image[] symbolSlots;
+    [SerializeField] private SlotAudioController slotAudio;
 
     [Header("Animation")]
     [SerializeField] private float symbolSpacing = 105f;
@@ -27,13 +28,7 @@ public class Reel : MonoBehaviour
     // spins reel to result
     public void SpinTo(SymbolData result, float spinDuration)
     {
-        if (IsSpinning ||
-            result == null ||
-            availableSymbols == null ||
-            availableSymbols.Length == 0)
-        {
-            return;
-        }
+        if (IsSpinning || result == null || availableSymbols == null || availableSymbols.Length == 0) { return; }
 
         StartCoroutine(SpinRoutine(result, spinDuration));
     }
@@ -49,7 +44,6 @@ public class Reel : MonoBehaviour
         while (elapsed < spinDuration)
         {
             float accelerationProgress = Mathf.Clamp01(elapsed / accelerationTime);
-
             float speedMultiplier = Mathf.SmoothStep(0f, 1f, accelerationProgress);
 
             MoveSymbols(spinSpeed * speedMultiplier * Time.deltaTime);
@@ -62,16 +56,13 @@ public class Reel : MonoBehaviour
         landingSlot.sprite = result.Sprite;
 
         float remainingDistance = landingSlot.rectTransform.anchoredPosition.y;
-
         float totalStopDistance = remainingDistance;
 
         // continues from full speed before rapidly decelerating toward the result
         while (remainingDistance > 0f)
         {
             float distanceRatio = Mathf.Clamp01(remainingDistance / totalStopDistance);
-
             float currentSpeed = spinSpeed * Mathf.Pow(distanceRatio, stopDecelerationPower);
-
             float distanceThisFrame = Mathf.Min(currentSpeed * Time.deltaTime, remainingDistance);
 
             MoveSymbols(distanceThisFrame);
@@ -81,6 +72,7 @@ public class Reel : MonoBehaviour
         }
 
         SnapSymbolsToGrid();
+        slotAudio.PlayReelStop();
 
         IsSpinning = false;
     }
@@ -89,7 +81,6 @@ public class Reel : MonoBehaviour
     private void MoveSymbols(float distance)
     {
         float loopHeight = symbolSpacing * symbolSlots.Length;
-
         float lowerRecycleLimit = -loopHeight / 2f;
 
         foreach (Image slot in symbolSlots)
