@@ -9,7 +9,9 @@
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
-/[Bb]uild/
+/[Bb]uild/*
+!/[Bb]uild/WebGL/
+!/[Bb]uild/WebGL/**
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
